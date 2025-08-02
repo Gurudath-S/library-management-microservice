@@ -1,0 +1,21 @@
+ISBN,Title,Author,Category,Publisher,TotalCopies,Price,PublicationYear,Pages,Language,Description
+978-0134685992,Spring Boot in Action,Craig Walls,Programming,Manning Publications,5,49.99,2015,424,English,Comprehensive guide to Spring Boot framework
+978-1491950357,Learning React,Alex Banks,Programming,O'Reilly Media,7,39.99,2017,350,English,Modern patterns for developing React apps
+978-1449355739,MongoDB: The Definitive Guide,Kristina Chodorow,Database,O'Reilly Media,4,45.99,2013,432,English,Powerful and scalable data storage
+978-0596517748,JavaScript: The Good Parts,Douglas Crockford,Programming,O'Reilly Media,8,29.99,2008,176,English,Distilling JavaScript to its essential parts
+978-0321125215,Domain-Driven Design,Eric Evans,Software Engineering,Addison-Wesley Professional,6,54.99,2003,560,English,Tackling complexity in the heart of software
+978-0134494166,Clean Code,Robert C. Martin,Programming,Prentice Hall,10,42.99,2008,464,English,A handbook of agile software craftsmanship
+978-1617294945,Spring in Action,Craig Walls,Programming,Manning Publications,9,49.99,2018,520,English,Spring Framework development guide
+978-0596809485,Beautiful Code,Andy Oram,Programming,O'Reilly Media,3,39.99,2007,618,English,Leading programmers explain how they think
+978-0134757599,Refactoring,Martin Fowler,Programming,Addison-Wesley Professional,5,54.99,2018,448,English,Improving the design of existing code
+978-0201633610,Design Patterns,Erich Gamma,Programming,Addison-Wesley Professional,7,59.99,1994,395,English,Elements of reusable object-oriented software
+978-0439708180,Harry Potter and the Sorcerer's Stone,J.K. Rowling,Fantasy,Scholastic,10,8.99,1997,309,English,A young wizard's magical journey
+978-0547928227,The Hobbit,J.R.R. Tolkien,Fantasy,Houghton Mifflin,5,16.99,1937,310,English,There and Back Again
+978-0451524935,1984,George Orwell,Fiction,Signet Classics,7,13.99,1949,328,English,Dystopian masterpiece
+978-0743273565,The Great Gatsby,F. Scott Fitzgerald,Fiction,Scribner,7,15.99,1925,180,English,American classic literature
+978-0316769174,The Catcher in the Rye,J.D. Salinger,Fiction,Little Brown,4,15.99,1951,234,English,Coming of age story
+978-0062316097,Sapiens,Yuval Noah Harari,History,Harper,9,22.99,2015,443,English,A brief history of humankind
+978-0553296983,Dune,Frank Herbert,Science Fiction,Ace,5,16.99,1965,688,English,Epic science fiction saga
+978-0439655484,The Hunger Games,Suzanne Collins,Young Adult,Scholastic,9,13.99,2008,374,English,Dystopian survival story
+978-0385537859,Freakonomics,Steven Levitt,Economics,William Morrow,5,16.99,2005,315,English,Hidden side of everything
+978-1400063515,The Tipping Point,Malcolm Gladwell,Psychology,Little Brown,6,17.99,2000,301,English,How little things make big difference

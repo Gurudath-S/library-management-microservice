@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-service
+  namespace: library-management
+  labels:
+    app: analytics-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analytics-service
+  template:
+    metadata:
+      labels:
+        app: analytics-service
+    spec:
+      containers:
+      - name: analytics-service
+        image: library-analytics-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8084
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "default"
+        - name: SERVER_PORT
+          value: "8084"
+        - name: SPRING_CONFIG_IMPORT
+          value: "configserver:http://config-server.library-management.svc.cluster.local:8888/"
+        - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+          value: "http://eureka-server.library-management.svc.cluster.local:8761/eureka/"
+        - name: EUREKA_INSTANCE_HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # Inter-service communication URLs
+        - name: USER_SERVICE_URL
+          value: "http://user-service.library-management.svc.cluster.local:8081"
+        - name: BOOK_SERVICE_URL
+          value: "http://book-service.library-management.svc.cluster.local:8082"
+        - name: TRANSACTION_SERVICE_URL
+          value: "http://transaction-service.library-management.svc.cluster.local:8083"
+        envFrom:
+        - configMapRef:
+            name: library-config
+        - secretRef:
+            name: library-secrets
+        resources:
+          requests:
+            memory: "768Mi"
+            cpu: "250m"
+          limits:
+            memory: "1.5Gi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8084
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8084
+          initialDelaySeconds: 120
+          periodSeconds: 30
+      initContainers:
+      - name: wait-for-dependencies
+        image: busybox:1.35
+        command: ['sh', '-c', 'until wget -q --tries=1 --timeout=2 --spider http://user-service.library-management.svc.cluster.local:8081/actuator/health && wget -q --tries=1 --timeout=2 --spider http://book-service.library-management.svc.cluster.local:8082/actuator/health && wget -q --tries=1 --timeout=2 --spider http://transaction-service.library-management.svc.cluster.local:8083/actuator/health; do echo waiting for dependencies; sleep 5; done']
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+  namespace: library-management
+  labels:
+    app: analytics-service
+spec:
+  selector:
+    app: analytics-service
+  ports:
+  - name: http
+    port: 8084
+    targetPort: 8084
+    protocol: TCP
+  type: ClusterIP
