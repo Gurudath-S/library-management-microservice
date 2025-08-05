@@ -1,0 +1,860 @@
+{
+	"info": {
+		"_postman_id": "a8f7c4e5-2d3f-4a8b-9c1e-5f6a7b8c9d0e",
+		"name": "Library Management - Analytics API Tests",
+		"description": "Comprehensive test suite for Library Management System Analytics API\n\nThis collection includes:\n- Authentication endpoints to get JWT tokens\n- Complete analytics API endpoints\n- Pre-request scripts for token management\n- Environment variables for easy configuration\n\nMake sure to:\n1. Start all microservices using start-microservices-with-data.ps1\n2. Set environment variables (baseUrl, adminToken, librarianToken)\n3. Run Login requests first to get tokens",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login - Admin User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.environment.set('adminToken', responseJson.token);",
+									"    pm.environment.set('adminUsername', responseJson.username);",
+									"    pm.environment.set('adminRole', responseJson.role);",
+									"    ",
+									"    pm.test('Login successful', function () {",
+									"        pm.expect(responseJson.token).to.not.be.empty;",
+									"        pm.expect(responseJson.role).to.eql('ADMIN');",
+									"    });",
+									"    ",
+									"    console.log('Admin token saved:', responseJson.token.substring(0, 20) + '...');",
+									"} else {",
+									"    pm.test('Login failed', function () {",
+									"        pm.expect.fail('Login should succeed with valid credentials');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usernameOrEmail\": \"admin\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login as admin to get JWT token for analytics access"
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Librarian User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.environment.set('librarianToken', responseJson.token);",
+									"    pm.environment.set('librarianUsername', responseJson.username);",
+									"    pm.environment.set('librarianRole', responseJson.role);",
+									"    ",
+									"    pm.test('Librarian login successful', function () {",
+									"        pm.expect(responseJson.token).to.not.be.empty;",
+									"        pm.expect(responseJson.role).to.eql('LIBRARIAN');",
+									"    });",
+									"    ",
+									"    console.log('Librarian token saved:', responseJson.token.substring(0, 20) + '...');",
+									"} else {",
+									"    pm.test('Librarian login failed', function () {",
+									"        pm.expect.fail('Login should succeed with valid credentials');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usernameOrEmail\": \"librarian1\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login as librarian to get JWT token for analytics access"
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Regular User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.environment.set('userToken', responseJson.token);",
+									"    pm.environment.set('regularUsername', responseJson.username);",
+									"    pm.environment.set('regularRole', responseJson.role);",
+									"    ",
+									"    pm.test('User login successful', function () {",
+									"        pm.expect(responseJson.token).to.not.be.empty;",
+									"        pm.expect(responseJson.role).to.eql('MEMBER');",
+									"    });",
+									"    ",
+									"    console.log('User token saved:', responseJson.token.substring(0, 20) + '...');",
+									"} else {",
+									"    pm.test('User login failed', function () {",
+									"        pm.expect.fail('Login should succeed with valid credentials');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usernameOrEmail\": \"user1\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login as regular user (limited analytics access)"
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Token validation successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Valid token response structure', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('username');",
+									"    pm.expect(responseJson).to.have.property('role');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/validate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"validate"
+							]
+						},
+						"description": "Validate JWT token"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints to obtain JWT tokens for API access"
+		},
+		{
+			"name": "Analytics API - Admin/Librarian Access",
+			"item": [
+				{
+					"name": "Get Complete Analytics Dashboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Dashboard retrieval successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Dashboard contains all analytics sections', function () {",
+									"    const responseJson = pm.response.json();",
+									"    const dashboard = responseJson.dashboard;",
+									"    ",
+									"    pm.expect(dashboard).to.have.property('userAnalytics');",
+									"    pm.expect(dashboard).to.have.property('bookAnalytics');",
+									"    pm.expect(dashboard).to.have.property('transactionAnalytics');",
+									"    pm.expect(dashboard).to.have.property('systemHealth');",
+									"    pm.expect(dashboard).to.have.property('inventoryAnalytics');",
+									"});",
+									"",
+									"pm.test('Response includes metadata', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('metadata');",
+									"    pm.expect(responseJson.metadata).to.have.property('executionTimeMs');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"dashboard"
+							]
+						},
+						"description": "Get comprehensive analytics dashboard with data from all microservices"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Analytics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('User analytics retrieval successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('User analytics structure is correct', function () {",
+									"    const responseJson = pm.response.json();",
+									"    const userAnalytics = responseJson.userAnalytics;",
+									"    ",
+									"    pm.expect(userAnalytics).to.have.property('totalUsers');",
+									"    pm.expect(userAnalytics).to.have.property('activeUsers');",
+									"    pm.expect(userAnalytics).to.have.property('newUsersThisMonth');",
+									"    pm.expect(userAnalytics).to.have.property('usersByRole');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"users"
+							]
+						},
+						"description": "Get user-specific analytics from User Service"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book Analytics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Book analytics retrieval successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Book analytics structure is correct', function () {",
+									"    const responseJson = pm.response.json();",
+									"    const bookAnalytics = responseJson.bookAnalytics;",
+									"    ",
+									"    pm.expect(bookAnalytics).to.have.property('totalBooks');",
+									"    pm.expect(bookAnalytics).to.have.property('availableBooks');",
+									"    pm.expect(bookAnalytics).to.have.property('totalCopies');",
+									"    pm.expect(bookAnalytics).to.have.property('totalAvailableCopies');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"books"
+							]
+						},
+						"description": "Get book-specific analytics from Book Service"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction Analytics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Transaction analytics retrieval successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Transaction analytics structure is correct', function () {",
+									"    const responseJson = pm.response.json();",
+									"    const transactionAnalytics = responseJson.transactionAnalytics;",
+									"    ",
+									"    pm.expect(transactionAnalytics).to.have.property('totalTransactions');",
+									"    pm.expect(transactionAnalytics).to.have.property('activeTransactions');",
+									"    pm.expect(transactionAnalytics).to.have.property('completedTransactions');",
+									"    pm.expect(transactionAnalytics).to.have.property('overdueTransactions');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/transactions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"transactions"
+							]
+						},
+						"description": "Get transaction-specific analytics from Transaction Service"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory Analytics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Inventory analytics retrieval successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Inventory analytics structure is correct', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('inventoryAnalytics');",
+									"    pm.expect(responseJson).to.have.property('generatedAt');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/inventory",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"inventory"
+							]
+						},
+						"description": "Get inventory analytics (cross-service aggregation)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Health (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('System health retrieval successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('System health structure is correct', function () {",
+									"    const responseJson = pm.response.json();",
+									"    const systemHealth = responseJson.systemHealth;",
+									"    ",
+									"    pm.expect(systemHealth).to.have.property('status');",
+									"    pm.expect(systemHealth).to.have.property('serviceStatus');",
+									"    pm.expect(systemHealth).to.have.property('performanceMetrics');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"health"
+							]
+						},
+						"description": "Get system health metrics (Admin access only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Analytics endpoints requiring Admin or Librarian access"
+		},
+		{
+			"name": "Analytics API - Public Access",
+			"item": [
+				{
+					"name": "Get Analytics Summary (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Analytics summary retrieval successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Summary contains basic stats', function () {",
+									"    const responseJson = pm.response.json();",
+									"    ",
+									"    pm.expect(responseJson).to.have.property('totalBooks');",
+									"    pm.expect(responseJson).to.have.property('availableBooks');",
+									"    pm.expect(responseJson).to.have.property('totalUsers');",
+									"    pm.expect(responseJson).to.have.property('activeTransactions');",
+									"    pm.expect(responseJson).to.have.property('systemStatus');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"summary"
+							]
+						},
+						"description": "Get public analytics summary (no authentication required)"
+					},
+					"response": []
+				}
+			],
+			"description": "Public analytics endpoints (no authentication required)"
+		},
+		{
+			"name": "Access Control Tests",
+			"item": [
+				{
+					"name": "Dashboard Access - Unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Unauthorized access blocked', function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"dashboard"
+							]
+						},
+						"description": "Test that dashboard access is blocked without authentication"
+					},
+					"response": []
+				},
+				{
+					"name": "Dashboard Access - Regular User (Should Fail)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Regular user access blocked', function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"dashboard"
+							]
+						},
+						"description": "Test that regular users cannot access dashboard"
+					},
+					"response": []
+				},
+				{
+					"name": "System Health - Librarian Access (Should Fail)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Librarian access to health endpoint blocked', function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{librarianToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"health"
+							]
+						},
+						"description": "Test that librarians cannot access system health (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Dashboard Access - Librarian (Should Succeed)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Librarian dashboard access successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Dashboard data available for librarian', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('dashboard');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{librarianToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"dashboard"
+							]
+						},
+						"description": "Test that librarians can access analytics dashboard"
+					},
+					"response": []
+				}
+			],
+			"description": "Test role-based access control for analytics endpoints"
+		},
+		{
+			"name": "Performance & Error Handling",
+			"item": [
+				{
+					"name": "Dashboard Performance Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Dashboard response time acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000); // 5 seconds",
+									"});",
+									"",
+									"pm.test('Dashboard includes performance metadata', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.metadata).to.have.property('executionTimeMs');",
+									"    ",
+									"    console.log('Dashboard generation time:', responseJson.metadata.executionTimeMs + 'ms');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"dashboard"
+							]
+						},
+						"description": "Test dashboard performance and response time"
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Token Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Invalid token rejected', function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer invalid-token-here"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/analytics/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"dashboard"
+							]
+						},
+						"description": "Test behavior with invalid JWT token"
+					},
+					"response": []
+				}
+			],
+			"description": "Performance and error handling tests"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set base URL if not already set",
+					"if (!pm.environment.get('baseUrl')) {",
+					"    pm.environment.set('baseUrl', 'http://localhost:8080');",
+					"}",
+					"",
+					"// Log current request info",
+					"console.log('Making request to:', pm.request.url.toString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Common test for all requests",
+					"pm.test('Response time is reasonable', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(10000); // 10 seconds",
+					"});",
+					"",
+					"// Log response info",
+					"console.log('Response status:', pm.response.status);",
+					"console.log('Response time:', pm.response.responseTime + 'ms');"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
