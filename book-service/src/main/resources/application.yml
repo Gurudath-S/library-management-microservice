@@ -43,4 +43,10 @@ logging:
   level:
     com.library: DEBUG
     org.springframework.cloud.config: DEBUG
+    org.springframework.security: DEBUG
     root: INFO
+
+# JWT Configuration - Must match other services
+app:
+  jwtSecret: libraryManagementSecretKeyThatNeedsToBeAtLeast256BitsLongForHS256Algorithm
+  jwtExpirationMs: 86400000

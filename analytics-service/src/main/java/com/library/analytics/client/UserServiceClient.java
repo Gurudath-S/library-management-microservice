@@ -1,12 +1,13 @@
 package com.library.analytics.client;
 
+import com.library.analytics.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "user-service", path = "/api/users")
+@FeignClient(name = "user-service", path = "/api/users", configuration = FeignConfig.class)
 public interface UserServiceClient {
     
     @GetMapping("/count")

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,37 +37,30 @@ public class AnalyticsService {
         AnalyticsDashboardDto dashboard = new AnalyticsDashboardDto();
         
         try {
-            // Parallel data collection from all services
-            CompletableFuture<UserAnalyticsDto> userAnalyticsFuture = 
-                CompletableFuture.supplyAsync(this::getUserAnalytics);
+            // Sequential data collection from all services to maintain security context
+            // This ensures JWT tokens are properly propagated in Feign client calls
+            logger.debug("Fetching user analytics...");
+            UserAnalyticsDto userAnalytics = getUserAnalytics();
             
-            CompletableFuture<BookAnalyticsDto> bookAnalyticsFuture = 
-                CompletableFuture.supplyAsync(this::getBookAnalytics);
+            logger.debug("Fetching book analytics...");
+            BookAnalyticsDto bookAnalytics = getBookAnalytics();
             
-            CompletableFuture<TransactionAnalyticsDto> transactionAnalyticsFuture = 
-                CompletableFuture.supplyAsync(this::getTransactionAnalytics);
+            logger.debug("Fetching transaction analytics...");
+            TransactionAnalyticsDto transactionAnalytics = getTransactionAnalytics();
             
-            CompletableFuture<SystemHealthDto> systemHealthFuture = 
-                CompletableFuture.supplyAsync(this::getSystemHealth);
-            
-            // Wait for all futures to complete
-            CompletableFuture.allOf(
-                userAnalyticsFuture, 
-                bookAnalyticsFuture, 
-                transactionAnalyticsFuture, 
-                systemHealthFuture
-            ).join();
+            logger.debug("Fetching system health...");
+            SystemHealthDto systemHealth = getSystemHealth();
             
             // Set results
-            dashboard.setUserAnalytics(userAnalyticsFuture.get());
-            dashboard.setBookAnalytics(bookAnalyticsFuture.get());
-            dashboard.setTransactionAnalytics(transactionAnalyticsFuture.get());
-            dashboard.setSystemHealth(systemHealthFuture.get());
+            dashboard.setUserAnalytics(userAnalytics);
+            dashboard.setBookAnalytics(bookAnalytics);
+            dashboard.setTransactionAnalytics(transactionAnalytics);
+            dashboard.setSystemHealth(systemHealth);
             
             // Generate inventory analytics (requires book and transaction data)
             dashboard.setInventoryAnalytics(generateInventoryAnalytics(
-                dashboard.getBookAnalytics(), 
-                dashboard.getTransactionAnalytics()
+                bookAnalytics, 
+                transactionAnalytics
             ));
             
             logger.info("Analytics dashboard generated successfully");
@@ -218,7 +210,7 @@ public class AnalyticsService {
             inventory.setUtilizationRate(Math.round(utilizationRate * 100.0) / 100.0);
         }
         
-        inventory.setLowStockCount(bookAnalytics.getLowStockBooks().size());
+        inventory.setLowStockCount(bookAnalytics.getLowStockBooks() != null ? bookAnalytics.getLowStockBooks().size() : 0);
         inventory.setOutOfStockCount(0); // Will be calculated from book service data
         
         return inventory;

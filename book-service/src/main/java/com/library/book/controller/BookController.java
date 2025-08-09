@@ -85,7 +85,7 @@ public class BookController {
     }
     
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<?> createBook(@Valid @RequestBody BookDto bookDto) {
         try {
             Book book = bookService.createBook(bookDto);
@@ -96,7 +96,7 @@ public class BookController {
     }
     
     @PostMapping("/upload")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<?> uploadBooksFromCsv(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Please select a CSV file to upload.");
@@ -120,7 +120,7 @@ public class BookController {
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<?> updateBook(@PathVariable Long id, @Valid @RequestBody BookDto bookDto) {
         try {
             Book book = bookService.updateBook(id, bookDto);
@@ -131,7 +131,7 @@ public class BookController {
     }
     
     @PutMapping("/{id}/inventory")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<?> updateInventory(@PathVariable Long id, 
                                            @RequestParam Integer totalCopies, 
                                            @RequestParam Integer availableCopies) {
@@ -144,7 +144,7 @@ public class BookController {
     }
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteBook(@PathVariable Long id) {
         try {
             bookService.deleteBook(id);
@@ -155,14 +155,14 @@ public class BookController {
     }
     
     @GetMapping("/low-stock")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<List<Book>> getLowStockBooks(@RequestParam(defaultValue = "5") Integer threshold) {
         List<Book> books = bookService.getLowStockBooks(threshold);
         return ResponseEntity.ok(books);
     }
     
     @GetMapping("/out-of-stock")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<List<Book>> getOutOfStockBooks() {
         List<Book> books = bookService.getOutOfStockBooks();
         return ResponseEntity.ok(books);
@@ -190,13 +190,13 @@ public class BookController {
     }
     
     @GetMapping("/stats/popular")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<List<Object[]>> getPopularBooks() {
         return ResponseEntity.ok(bookService.getPopularBooks());
     }
     
     @GetMapping("/stats/recent")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<List<Object[]>> getRecentlyAddedBooks() {
         return ResponseEntity.ok(bookService.getRecentlyAddedBooks());
     }
