@@ -196,10 +196,10 @@ public class BookController {
         List<Object[]> rawData = bookService.getPopularBooks();
         List<BookStatsDto> statsData = rawData.stream()
             .map(row -> new BookStatsDto(
-                (Long) row[0],           // id
+                    ((Number) row[0]).longValue(),           // id
                 (String) row[1],         // title  
                 (String) row[2],         // author
-                (Long) row[3],           // borrowedCount
+                    ((Number) row[3]).longValue(),           // borrowedCount
                 null                     // createdAt (not needed for popular)
             ))
             .collect(Collectors.toList());
@@ -212,7 +212,7 @@ public class BookController {
         List<Object[]> rawData = bookService.getRecentlyAddedBooks();
         List<BookStatsDto> statsData = rawData.stream()
             .map(row -> new BookStatsDto(
-                (Long) row[0],           // id
+                    ((Number) row[0]).longValue(),           // id
                 (String) row[1],         // title
                 (String) row[2],         // author  
                 null,                    // borrowedCount (not needed for recent)

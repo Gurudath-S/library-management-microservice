@@ -36,52 +36,100 @@ public class AnalyticsService {
         
         AnalyticsDashboardDto dashboard = new AnalyticsDashboardDto();
         
+        // Sequential data collection from all services with individual error handling
+        // This ensures JWT tokens are properly propagated in Feign client calls
+        UserAnalyticsDto userAnalytics = null;
+        BookAnalyticsDto bookAnalytics = null;
+        TransactionAnalyticsDto transactionAnalytics = null;
+        SystemHealthDto systemHealth = null;
+        
+        // Fetch user analytics with individual error handling
         try {
-            // Sequential data collection from all services to maintain security context
-            // This ensures JWT tokens are properly propagated in Feign client calls
             logger.debug("Fetching user analytics...");
-            UserAnalyticsDto userAnalytics = getUserAnalytics();
-            
+            userAnalytics = getUserAnalytics();
+        } catch (Exception e) {
+            logger.error("Failed to fetch user analytics, using fallback", e);
+            userAnalytics = getFallbackUserAnalytics();
+        }
+        
+        // Fetch book analytics with individual error handling
+        try {
             logger.debug("Fetching book analytics...");
-            BookAnalyticsDto bookAnalytics = getBookAnalytics();
-            
+            bookAnalytics = getBookAnalytics();
+        } catch (Exception e) {
+            logger.error("Failed to fetch book analytics, using fallback", e);
+            bookAnalytics = getFallbackBookAnalytics();
+        }
+        
+        // Fetch transaction analytics with individual error handling
+        try {
             logger.debug("Fetching transaction analytics...");
-            TransactionAnalyticsDto transactionAnalytics = getTransactionAnalytics();
-            
+            transactionAnalytics = getTransactionAnalytics();
+        } catch (Exception e) {
+            logger.error("Failed to fetch transaction analytics, using fallback", e);
+            transactionAnalytics = getFallbackTransactionAnalytics();
+        }
+        
+        // Fetch system health with individual error handling
+        try {
             logger.debug("Fetching system health...");
-            SystemHealthDto systemHealth = getSystemHealth();
-            
-            // Set results
-            dashboard.setUserAnalytics(userAnalytics);
-            dashboard.setBookAnalytics(bookAnalytics);
-            dashboard.setTransactionAnalytics(transactionAnalytics);
-            dashboard.setSystemHealth(systemHealth);
-            
-            // Generate inventory analytics (requires book and transaction data)
+            systemHealth = getSystemHealth();
+        } catch (Exception e) {
+            logger.error("Failed to fetch system health, using fallback", e);
+            systemHealth = getFallbackSystemHealth();
+        }
+        
+        // Set results (even if some are fallback values)
+        dashboard.setUserAnalytics(userAnalytics);
+        dashboard.setBookAnalytics(bookAnalytics);
+        dashboard.setTransactionAnalytics(transactionAnalytics);
+        dashboard.setSystemHealth(systemHealth);
+        
+        // Generate inventory analytics (handles null values gracefully)
+        try {
             dashboard.setInventoryAnalytics(generateInventoryAnalytics(
                 bookAnalytics, 
                 transactionAnalytics
             ));
-            
-            logger.info("Analytics dashboard generated successfully");
-            return dashboard;
-            
         } catch (Exception e) {
-            logger.error("Error generating analytics dashboard", e);
-            throw new RuntimeException("Failed to generate analytics dashboard", e);
+            logger.error("Failed to generate inventory analytics, using empty analytics", e);
+            dashboard.setInventoryAnalytics(new InventoryAnalyticsDto());
         }
+        
+        logger.info("Analytics dashboard generated successfully (some data may be from fallbacks)");
+        return dashboard;
     }
     
     @CircuitBreaker(name = "user-analytics", fallbackMethod = "fallbackGetUserAnalytics")
     public UserAnalyticsDto getUserAnalytics() {
         UserAnalyticsDto analytics = new UserAnalyticsDto();
         
+        // Get total users count with individual error handling
         try {
             analytics.setTotalUsers(userServiceClient.getTotalUsersCount());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch total users count: {}", e.getMessage());
+            analytics.setTotalUsers(0);
+        }
+        
+        // Get active users count with individual error handling
+        try {
             analytics.setActiveUsers(userServiceClient.getActiveUsersCount());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch active users count: {}", e.getMessage());
+            analytics.setActiveUsers(0);
+        }
+        
+        // Get new users this month with individual error handling
+        try {
             analytics.setNewUsersThisMonth(userServiceClient.getNewUsersThisMonth());
-            
-            // Convert user count by role to Map
+        } catch (Exception e) {
+            logger.warn("Failed to fetch new users this month: {}", e.getMessage());
+            analytics.setNewUsersThisMonth(0);
+        }
+        
+        // Get user count by role with individual error handling
+        try {
             List<Map<String, Object>> roleData = userServiceClient.getUserCountByRole();
             Map<String, Long> usersByRole = roleData.stream()
                 .collect(Collectors.toMap(
@@ -89,13 +137,25 @@ public class AnalyticsService {
                     map -> ((Number) map.get("count")).longValue()
                 ));
             analytics.setUsersByRole(usersByRole);
-            
+        } catch (Exception e) {
+            logger.warn("Failed to fetch user count by role: {}", e.getMessage());
+            analytics.setUsersByRole(new HashMap<>());
+        }
+        
+        // Get user growth stats with individual error handling
+        try {
             analytics.setUserGrowthStats(userServiceClient.getUserGrowthStats());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch user growth stats: {}", e.getMessage());
+            analytics.setUserGrowthStats(null);
+        }
+        
+        // Get top borrowers with individual error handling
+        try {
             analytics.setTopBorrowers(userServiceClient.getTopBorrowers());
-            
-        } catch (FeignException e) {
-            logger.error("Error fetching user analytics from user-service", e);
-            analytics = getFallbackUserAnalytics();
+        } catch (Exception e) {
+            logger.warn("Failed to fetch top borrowers: {}", e.getMessage());
+            analytics.setTopBorrowers(null);
         }
         
         return analytics;
@@ -105,37 +165,74 @@ public class AnalyticsService {
     public BookAnalyticsDto getBookAnalytics() {
         BookAnalyticsDto analytics = new BookAnalyticsDto();
         
+        // Get total books count with individual error handling
         try {
             analytics.setTotalBooks(bookServiceClient.getTotalBooksCount());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch total books count: {}", e.getMessage());
+            analytics.setTotalBooks(0);
+        }
+        
+        // Get total copies with individual error handling
+        try {
             analytics.setTotalCopies(bookServiceClient.getTotalCopies());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch total copies: {}", e.getMessage());
+            analytics.setTotalCopies(0);
+        }
+        
+        // Get total available copies with individual error handling
+        try {
             analytics.setTotalAvailableCopies(bookServiceClient.getTotalAvailableCopies());
             analytics.setAvailableBooks(analytics.getTotalAvailableCopies() > 0 ? 1 : 0); // Simplified
-            
-            // Convert book count by category
+        } catch (Exception e) {
+            logger.warn("Failed to fetch total available copies: {}", e.getMessage());
+            analytics.setTotalAvailableCopies(0);
+            analytics.setAvailableBooks(0);
+        }
+        
+        // Get book count by category with individual error handling
+        try {
             List<Map<String, Object>> categoryData = bookServiceClient.getBookCountByCategory();
             analytics.setBooksByCategory(categoryData.stream()
                 .map(map -> new Object[]{map.get("category"), map.get("count")})
                 .collect(Collectors.toList()));
-            
-            // Convert DTOs to Object[] format for compatibility
+        } catch (Exception e) {
+            logger.warn("Failed to fetch book count by category: {}", e.getMessage());
+            analytics.setBooksByCategory(null);
+        }
+        
+        // Get low stock books with individual error handling
+        try {
             List<BookServiceClient.BookDto> lowStockBooksDto = bookServiceClient.getLowStockBooks(5);
             analytics.setLowStockBooks(lowStockBooksDto.stream()
                 .map(book -> new Object[]{book.getId(), book.getTitle(), book.getAuthor(), book.getAvailableCopies()})
                 .collect(Collectors.toList()));
-            
+        } catch (Exception e) {
+            logger.warn("Failed to fetch low stock books: {}", e.getMessage());
+            analytics.setLowStockBooks(null);
+        }
+        
+        // Get popular books with individual error handling
+        try {
             List<BookServiceClient.BookStatsDto> popularBooksDto = bookServiceClient.getPopularBooks();
             analytics.setPopularBooks(popularBooksDto.stream()
                 .map(book -> new Object[]{book.getId(), book.getTitle(), book.getAuthor(), book.getBorrowedCount()})
                 .collect(Collectors.toList()));
-            
+        } catch (Exception e) {
+            logger.warn("Failed to fetch popular books: {}", e.getMessage());
+            analytics.setPopularBooks(null);
+        }
+        
+        // Get recently added books with individual error handling
+        try {
             List<BookServiceClient.BookStatsDto> recentBooksDto = bookServiceClient.getRecentlyAddedBooks();
             analytics.setRecentlyAddedBooks(recentBooksDto.stream()
                 .map(book -> new Object[]{book.getId(), book.getTitle(), book.getAuthor(), book.getCreatedAt()})
                 .collect(Collectors.toList()));
-            
-        } catch (FeignException e) {
-            logger.error("Error fetching book analytics from book-service", e);
-            analytics = getFallbackBookAnalytics();
+        } catch (Exception e) {
+            logger.warn("Failed to fetch recently added books: {}", e.getMessage());
+            analytics.setRecentlyAddedBooks(null);
         }
         
         return analytics;
@@ -145,19 +242,60 @@ public class AnalyticsService {
     public TransactionAnalyticsDto getTransactionAnalytics() {
         TransactionAnalyticsDto analytics = new TransactionAnalyticsDto();
         
+        // Get total transactions count with individual error handling
         try {
             analytics.setTotalTransactions(transactionServiceClient.getTotalTransactionsCount());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch total transactions count: {}", e.getMessage());
+            analytics.setTotalTransactions(0);
+        }
+        
+        // Get active transactions count with individual error handling
+        try {
             analytics.setActiveTransactions(transactionServiceClient.getActiveTransactionsCount());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch active transactions count: {}", e.getMessage());
+            analytics.setActiveTransactions(0);
+        }
+        
+        // Get completed transactions count with individual error handling
+        try {
             analytics.setCompletedTransactions(transactionServiceClient.getCompletedTransactionsCount());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch completed transactions count: {}", e.getMessage());
+            analytics.setCompletedTransactions(0);
+        }
+        
+        // Get overdue transactions count with individual error handling
+        try {
             analytics.setOverdueTransactions(transactionServiceClient.getOverdueTransactionsCount());
-            
+        } catch (Exception e) {
+            logger.warn("Failed to fetch overdue transactions count: {}", e.getMessage());
+            analytics.setOverdueTransactions(0);
+        }
+        
+        // Get monthly stats with individual error handling
+        try {
             analytics.setMonthlyStats(transactionServiceClient.getMonthlyTransactionStats());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch monthly transaction stats: {}", e.getMessage());
+            analytics.setMonthlyStats(null);
+        }
+        
+        // Get most borrowed books with individual error handling
+        try {
             analytics.setMostBorrowedBooks(transactionServiceClient.getMostBorrowedBooks());
+        } catch (Exception e) {
+            logger.warn("Failed to fetch most borrowed books: {}", e.getMessage());
+            analytics.setMostBorrowedBooks(null);
+        }
+        
+        // Get user borrowing patterns with individual error handling
+        try {
             analytics.setUserBorrowingPatterns(transactionServiceClient.getUserBorrowingPatterns());
-            
-        } catch (FeignException e) {
-            logger.error("Error fetching transaction analytics from transaction-service", e);
-            analytics = getFallbackTransactionAnalytics();
+        } catch (Exception e) {
+            logger.warn("Failed to fetch user borrowing patterns: {}", e.getMessage());
+            analytics.setUserBorrowingPatterns(null);
         }
         
         return analytics;
@@ -211,18 +349,29 @@ public class AnalyticsService {
                                                             TransactionAnalyticsDto transactionAnalytics) {
         InventoryAnalyticsDto inventory = new InventoryAnalyticsDto();
         
-        inventory.setTotalBooks(bookAnalytics.getTotalBooks());
-        inventory.setTotalCopies(bookAnalytics.getTotalCopies());
-        inventory.setAvailableCopies(bookAnalytics.getTotalAvailableCopies());
-        inventory.setBorrowedCopies(transactionAnalytics.getActiveTransactions());
+        // Safely get book analytics data with null checks
+        inventory.setTotalBooks(bookAnalytics != null ? bookAnalytics.getTotalBooks() : 0);
+        inventory.setTotalCopies(bookAnalytics != null ? bookAnalytics.getTotalCopies() : 0);
+        inventory.setAvailableCopies(bookAnalytics != null ? bookAnalytics.getTotalAvailableCopies() : 0);
         
-        // Calculate utilization rate
+        // Safely get transaction analytics data with null checks
+        inventory.setBorrowedCopies(transactionAnalytics != null ? transactionAnalytics.getActiveTransactions() : 0);
+        
+        // Calculate utilization rate with safe division
         if (inventory.getTotalCopies() > 0) {
             double utilizationRate = (double) inventory.getBorrowedCopies() / inventory.getTotalCopies() * 100;
             inventory.setUtilizationRate(Math.round(utilizationRate * 100.0) / 100.0);
+        } else {
+            inventory.setUtilizationRate(0.0);
         }
         
-        inventory.setLowStockCount(bookAnalytics.getLowStockBooks() != null ? bookAnalytics.getLowStockBooks().size() : 0);
+        // Safely calculate low stock count
+        if (bookAnalytics != null && bookAnalytics.getLowStockBooks() != null) {
+            inventory.setLowStockCount(bookAnalytics.getLowStockBooks().size());
+        } else {
+            inventory.setLowStockCount(0);
+        }
+        
         inventory.setOutOfStockCount(0); // Will be calculated from book service data
         
         return inventory;
