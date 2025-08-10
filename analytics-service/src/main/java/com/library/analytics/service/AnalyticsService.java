@@ -117,9 +117,21 @@ public class AnalyticsService {
                 .map(map -> new Object[]{map.get("category"), map.get("count")})
                 .collect(Collectors.toList()));
             
-            analytics.setLowStockBooks(bookServiceClient.getLowStockBooks());
-            analytics.setPopularBooks(bookServiceClient.getPopularBooks());
-            analytics.setRecentlyAddedBooks(bookServiceClient.getRecentlyAddedBooks());
+            // Convert DTOs to Object[] format for compatibility
+            List<BookServiceClient.BookDto> lowStockBooksDto = bookServiceClient.getLowStockBooks(5);
+            analytics.setLowStockBooks(lowStockBooksDto.stream()
+                .map(book -> new Object[]{book.getId(), book.getTitle(), book.getAuthor(), book.getAvailableCopies()})
+                .collect(Collectors.toList()));
+            
+            List<BookServiceClient.BookStatsDto> popularBooksDto = bookServiceClient.getPopularBooks();
+            analytics.setPopularBooks(popularBooksDto.stream()
+                .map(book -> new Object[]{book.getId(), book.getTitle(), book.getAuthor(), book.getBorrowedCount()})
+                .collect(Collectors.toList()));
+            
+            List<BookServiceClient.BookStatsDto> recentBooksDto = bookServiceClient.getRecentlyAddedBooks();
+            analytics.setRecentlyAddedBooks(recentBooksDto.stream()
+                .map(book -> new Object[]{book.getId(), book.getTitle(), book.getAuthor(), book.getCreatedAt()})
+                .collect(Collectors.toList()));
             
         } catch (FeignException e) {
             logger.error("Error fetching book analytics from book-service", e);

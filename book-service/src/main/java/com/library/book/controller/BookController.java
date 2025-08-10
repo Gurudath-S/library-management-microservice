@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/books")
@@ -191,14 +192,34 @@ public class BookController {
     
     @GetMapping("/stats/popular")
 //    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
-    public ResponseEntity<List<Object[]>> getPopularBooks() {
-        return ResponseEntity.ok(bookService.getPopularBooks());
+    public ResponseEntity<List<BookStatsDto>> getPopularBooks() {
+        List<Object[]> rawData = bookService.getPopularBooks();
+        List<BookStatsDto> statsData = rawData.stream()
+            .map(row -> new BookStatsDto(
+                (Long) row[0],           // id
+                (String) row[1],         // title  
+                (String) row[2],         // author
+                (Long) row[3],           // borrowedCount
+                null                     // createdAt (not needed for popular)
+            ))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(statsData);
     }
     
     @GetMapping("/stats/recent")
 //    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
-    public ResponseEntity<List<Object[]>> getRecentlyAddedBooks() {
-        return ResponseEntity.ok(bookService.getRecentlyAddedBooks());
+    public ResponseEntity<List<BookStatsDto>> getRecentlyAddedBooks() {
+        List<Object[]> rawData = bookService.getRecentlyAddedBooks();
+        List<BookStatsDto> statsData = rawData.stream()
+            .map(row -> new BookStatsDto(
+                (Long) row[0],           // id
+                (String) row[1],         // title
+                (String) row[2],         // author  
+                null,                    // borrowedCount (not needed for recent)
+                row[3].toString()        // createdAt
+            ))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(statsData);
     }
     
     @GetMapping("/{id}/simple")
@@ -234,5 +255,40 @@ public class BookController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+    
+    // DTO class for book statistics
+    public static class BookStatsDto {
+        private Long id;
+        private String title;
+        private String author;
+        private Long borrowedCount;
+        private String createdAt;
+        
+        public BookStatsDto() {}
+        
+        public BookStatsDto(Long id, String title, String author, Long borrowedCount, String createdAt) {
+            this.id = id;
+            this.title = title;
+            this.author = author;
+            this.borrowedCount = borrowedCount;
+            this.createdAt = createdAt;
+        }
+        
+        // Getters and Setters
+        public Long getId() { return id; }
+        public void setId(Long id) { this.id = id; }
+        
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        
+        public String getAuthor() { return author; }
+        public void setAuthor(String author) { this.author = author; }
+        
+        public Long getBorrowedCount() { return borrowedCount; }
+        public void setBorrowedCount(Long borrowedCount) { this.borrowedCount = borrowedCount; }
+        
+        public String getCreatedAt() { return createdAt; }
+        public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     }
 }
