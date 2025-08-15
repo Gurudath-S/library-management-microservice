@@ -41,6 +41,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByDateRange(@Param("startDate") LocalDateTime startDate, 
                                     @Param("endDate") LocalDateTime endDate);
     
+    // Count transactions by date range
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.createdAt BETWEEN :startDate AND :endDate")
+    long countByCreatedAtBetween(@Param("startDate") LocalDateTime startDate, 
+                                @Param("endDate") LocalDateTime endDate);
+    
     // Find transactions by type
     List<Transaction> findByType(Transaction.TransactionType type);
     

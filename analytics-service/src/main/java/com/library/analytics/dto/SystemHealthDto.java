@@ -1,17 +1,25 @@
 package com.library.analytics.dto;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 public class SystemHealthDto {
     private String status;
-    private Map<String, String> serviceStatus;
-    private Map<String, Object> performanceMetrics;
-    private LocalDateTime lastChecked;
+    private double responseTime;
+    private long uptime;
+    private Map<String, String> moduleStatus;
+    private List<String> recentErrors;
     
     // Constructors
-    public SystemHealthDto() {
-        this.lastChecked = LocalDateTime.now();
+    public SystemHealthDto() {}
+    
+    public SystemHealthDto(String status, double responseTime, long uptime,
+                          Map<String, String> moduleStatus, List<String> recentErrors) {
+        this.status = status;
+        this.responseTime = responseTime;
+        this.uptime = uptime;
+        this.moduleStatus = moduleStatus;
+        this.recentErrors = recentErrors;
     }
     
     // Getters and Setters
@@ -23,27 +31,35 @@ public class SystemHealthDto {
         this.status = status;
     }
     
-    public Map<String, String> getServiceStatus() {
-        return serviceStatus;
+    public double getResponseTime() {
+        return responseTime;
     }
     
-    public void setServiceStatus(Map<String, String> serviceStatus) {
-        this.serviceStatus = serviceStatus;
+    public void setResponseTime(double responseTime) {
+        this.responseTime = responseTime;
     }
     
-    public Map<String, Object> getPerformanceMetrics() {
-        return performanceMetrics;
+    public long getUptime() {
+        return uptime;
     }
     
-    public void setPerformanceMetrics(Map<String, Object> performanceMetrics) {
-        this.performanceMetrics = performanceMetrics;
+    public void setUptime(long uptime) {
+        this.uptime = uptime;
     }
     
-    public LocalDateTime getLastChecked() {
-        return lastChecked;
+    public Map<String, String> getModuleStatus() {
+        return moduleStatus;
     }
     
-    public void setLastChecked(LocalDateTime lastChecked) {
-        this.lastChecked = lastChecked;
+    public void setModuleStatus(Map<String, String> moduleStatus) {
+        this.moduleStatus = moduleStatus;
+    }
+    
+    public List<String> getRecentErrors() {
+        return recentErrors;
+    }
+    
+    public void setRecentErrors(List<String> recentErrors) {
+        this.recentErrors = recentErrors;
     }
 }

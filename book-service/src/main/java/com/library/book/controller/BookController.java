@@ -175,6 +175,11 @@ public class BookController {
         return ResponseEntity.ok(bookService.getTotalBooksCount());
     }
     
+    @GetMapping("/available-count")
+    public ResponseEntity<Long> getAvailableBooksCount() {
+        return ResponseEntity.ok(bookService.getAvailableBooksCount());
+    }
+    
     @GetMapping("/total-copies")
     public ResponseEntity<Long> getTotalCopies() {
         return ResponseEntity.ok(bookService.getTotalCopies());

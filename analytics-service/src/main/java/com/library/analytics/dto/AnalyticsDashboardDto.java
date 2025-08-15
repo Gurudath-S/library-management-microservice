@@ -1,5 +1,7 @@
 package com.library.analytics.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 
 public class AnalyticsDashboardDto {
@@ -8,6 +10,7 @@ public class AnalyticsDashboardDto {
     private TransactionAnalyticsDto transactionAnalytics;
     private InventoryAnalyticsDto inventoryAnalytics;
     private SystemHealthDto systemHealth;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime generatedAt;
     
     public AnalyticsDashboardDto() {

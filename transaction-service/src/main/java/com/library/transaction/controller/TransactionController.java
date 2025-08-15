@@ -119,6 +119,21 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getOverdueTransactionsCount());
     }
     
+    @GetMapping("/count/today")
+    public ResponseEntity<Long> getTransactionsTodayCount() {
+        return ResponseEntity.ok(transactionService.getTransactionsTodayCount());
+    }
+    
+    @GetMapping("/count/this-week")
+    public ResponseEntity<Long> getTransactionsThisWeekCount() {
+        return ResponseEntity.ok(transactionService.getTransactionsThisWeekCount());
+    }
+    
+    @GetMapping("/count/this-month")
+    public ResponseEntity<Long> getTransactionsThisMonthCount() {
+        return ResponseEntity.ok(transactionService.getTransactionsThisMonthCount());
+    }
+    
     @GetMapping("/stats/monthly")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<List<Object[]>> getMonthlyTransactionStats() {

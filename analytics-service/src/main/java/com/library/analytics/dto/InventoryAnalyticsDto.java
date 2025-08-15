@@ -1,26 +1,33 @@
 package com.library.analytics.dto;
 
+import java.util.List;
+import java.util.Map;
+
 public class InventoryAnalyticsDto {
-    private long totalBooks;
     private long totalCopies;
     private long availableCopies;
     private long borrowedCopies;
     private double utilizationRate;
-    private long lowStockCount;
-    private long outOfStockCount;
+    private List<String> lowStockBooks;
+    private List<String> highDemandBooks;
+    private Map<String, Double> categoryUtilization;
     
     // Constructors
     public InventoryAnalyticsDto() {}
     
+    public InventoryAnalyticsDto(long totalCopies, long availableCopies, long borrowedCopies,
+                                double utilizationRate, List<String> lowStockBooks,
+                                List<String> highDemandBooks, Map<String, Double> categoryUtilization) {
+        this.totalCopies = totalCopies;
+        this.availableCopies = availableCopies;
+        this.borrowedCopies = borrowedCopies;
+        this.utilizationRate = utilizationRate;
+        this.lowStockBooks = lowStockBooks;
+        this.highDemandBooks = highDemandBooks;
+        this.categoryUtilization = categoryUtilization;
+    }
+    
     // Getters and Setters
-    public long getTotalBooks() {
-        return totalBooks;
-    }
-    
-    public void setTotalBooks(long totalBooks) {
-        this.totalBooks = totalBooks;
-    }
-    
     public long getTotalCopies() {
         return totalCopies;
     }
@@ -53,19 +60,27 @@ public class InventoryAnalyticsDto {
         this.utilizationRate = utilizationRate;
     }
     
-    public long getLowStockCount() {
-        return lowStockCount;
+    public List<String> getLowStockBooks() {
+        return lowStockBooks;
     }
     
-    public void setLowStockCount(long lowStockCount) {
-        this.lowStockCount = lowStockCount;
+    public void setLowStockBooks(List<String> lowStockBooks) {
+        this.lowStockBooks = lowStockBooks;
     }
     
-    public long getOutOfStockCount() {
-        return outOfStockCount;
+    public List<String> getHighDemandBooks() {
+        return highDemandBooks;
     }
     
-    public void setOutOfStockCount(long outOfStockCount) {
-        this.outOfStockCount = outOfStockCount;
+    public void setHighDemandBooks(List<String> highDemandBooks) {
+        this.highDemandBooks = highDemandBooks;
+    }
+    
+    public Map<String, Double> getCategoryUtilization() {
+        return categoryUtilization;
+    }
+    
+    public void setCategoryUtilization(Map<String, Double> categoryUtilization) {
+        this.categoryUtilization = categoryUtilization;
     }
 }

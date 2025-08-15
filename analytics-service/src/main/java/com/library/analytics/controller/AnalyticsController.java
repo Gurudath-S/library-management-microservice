@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,14 +51,21 @@ public class AnalyticsController {
             
             logger.info("Analytics dashboard generated successfully in {} ms", executionTime);
             
-            // Add execution metadata for performance analysis
+            // Format the current timestamp in ISO format for metadata
+            LocalDateTime now = LocalDateTime.now();
+            String isoTimestamp = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS"));
+            
+            // Build the response in the exact required format
             Map<String, Object> response = new HashMap<>();
+            
+            // Metadata section
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("executionTimeMs", executionTime);
+            metadata.put("generatedAt", isoTimestamp);
+            metadata.put("dataFreshness", "REAL_TIME");
+            
+            response.put("metadata", metadata);
             response.put("dashboard", dashboard);
-            response.put("metadata", Map.of(
-                "executionTimeMs", executionTime,
-                "generatedAt", dashboard.getGeneratedAt(),
-                "dataFreshness", "REAL_TIME"
-            ));
             
             return ResponseEntity.ok(response);
             

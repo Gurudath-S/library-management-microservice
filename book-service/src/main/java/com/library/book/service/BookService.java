@@ -214,6 +214,10 @@ public class BookService {
         return bookRepository.count();
     }
     
+    public long getAvailableBooksCount() {
+        return bookRepository.countByAvailableCopiesGreaterThan(0);
+    }
+    
     public long getTotalCopies() {
         return bookRepository.getTotalCopies();
     }

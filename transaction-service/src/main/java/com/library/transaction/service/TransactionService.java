@@ -217,4 +217,22 @@ public class TransactionService {
     public List<Object[]> getUserBorrowingPatterns() {
         return transactionRepository.getUserBorrowingPatterns(Transaction.TransactionType.BORROW);
     }
+    
+    public long getTransactionsTodayCount() {
+        LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+        return transactionRepository.countByCreatedAtBetween(startOfDay, endOfDay);
+    }
+    
+    public long getTransactionsThisWeekCount() {
+        LocalDateTime startOfWeek = LocalDateTime.now().minusDays(LocalDateTime.now().getDayOfWeek().getValue() - 1).toLocalDate().atStartOfDay();
+        LocalDateTime endOfWeek = startOfWeek.plusDays(7);
+        return transactionRepository.countByCreatedAtBetween(startOfWeek, endOfWeek);
+    }
+    
+    public long getTransactionsThisMonthCount() {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).toLocalDate().atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+        return transactionRepository.countByCreatedAtBetween(startOfMonth, endOfMonth);
+    }
 }

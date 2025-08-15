@@ -14,6 +14,9 @@ public interface BookServiceClient {
     @GetMapping("/count")
     Long getTotalBooksCount();
     
+    @GetMapping("/available-count")
+    Long getAvailableBooksCount();
+    
     @GetMapping("/total-copies")
     Long getTotalCopies();
     

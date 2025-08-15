@@ -21,6 +21,15 @@ public interface TransactionServiceClient {
     @GetMapping("/count/overdue")
     Long getOverdueTransactionsCount();
     
+    @GetMapping("/count/today")
+    Long getTransactionsTodayCount();
+    
+    @GetMapping("/count/this-week")
+    Long getTransactionsThisWeekCount();
+    
+    @GetMapping("/count/this-month")
+    Long getTransactionsThisMonthCount();
+    
     @GetMapping("/stats/monthly")
     List<Object[]> getMonthlyTransactionStats();
     
