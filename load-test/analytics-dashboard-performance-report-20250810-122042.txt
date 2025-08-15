@@ -1,4 +1,4 @@
-﻿=== MONOLITHIC ARCHITECTURE PERFORMANCE REPORT ===
+﻿=== Microservices ARCHITECTURE PERFORMANCE REPORT ===
 Generated: 2025-08-10 12:20:42
 
 Test Configuration:
@@ -35,21 +35,10 @@ Performance Assessment:
   [!] Good response time (500-1000ms)
   [+] Excellent reliability (> 95% success rate)
 
-Architecture Notes:
-  - This test represents monolithic architecture baseline performance
-  - Data aggregation happens within single application process
-  - Database queries execute against single H2 instance
-  - No inter-service communication overhead
-  - Suitable for comparison with microservices architecture
-
 Test Environment:
   - Spring Boot 3.3.0 application
   - H2 in-memory database
   - JWT authentication
   - Test data: 48 users, 52 books, 138 transactions
-
-Files Generated:
-  - Detailed CSV results: analytics-dashboard-load-test-results-20250810-122042.csv
-  - Performance report: analytics-dashboard-performance-report-20250810-122042.txt
 
 === END OF REPORT ===
