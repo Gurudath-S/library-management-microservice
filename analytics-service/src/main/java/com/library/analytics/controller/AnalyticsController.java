@@ -17,7 +17,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analytics")
-@CrossOrigin(origins = "*")
 public class AnalyticsController {
     
     private static final Logger logger = LoggerFactory.getLogger(AnalyticsController.class);

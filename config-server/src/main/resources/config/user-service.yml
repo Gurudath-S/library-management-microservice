@@ -43,7 +43,7 @@ management:
         enabled: true
 
 jwt:
-  secret: libraryManagementSecretKey123456789
+  secret: LibraryManagementSecretKey20241234567890
   expiration: 86400000
 
 resilience4j:

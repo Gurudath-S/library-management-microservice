@@ -42,7 +42,9 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOriginPatterns: "*"
+            allowedOriginPatterns: 
+              - "http://localhost:3000"
+              - "http://127.0.0.1:3000"
             allowedMethods:
               - GET
               - POST
@@ -74,7 +76,7 @@ management:
         enabled: true
 
 jwt:
-  secret: libraryManagementSecretKey123456789
+  secret: LibraryManagementSecretKey20241234567890
 
 resilience4j:
   circuitbreaker:
