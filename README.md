@@ -115,7 +115,6 @@ Database Independence
 
 Service Communication Pattern
   -Synchronous: REST APIs with Feign clients
-  -Asynchronous: Event-driven via Azure Service Bus
   -Discovery: Dynamic service resolution via Eureka
 💾 Data Architecture
   Database Design
