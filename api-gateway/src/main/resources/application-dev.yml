@@ -1,0 +1,8 @@
+spring:
+  config:
+    import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://config-server:8888}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server.library-management.svc.cluster.local:8761/eureka/

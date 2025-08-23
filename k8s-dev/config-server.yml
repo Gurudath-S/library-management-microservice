@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: config-server
-          image: microservice.azurecr.io/spring-config:latest
+          image: microservice.azurecr.io/config-server:1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8888
