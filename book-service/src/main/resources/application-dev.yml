@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: book-service
+  cloud:
+    config:
+      uri: http://config-server.library-management.svc.cluster.local:8888   # Use service name inside cluster
+      fail-fast: true
+
+server:
+  port: ${SERVER_PORT:8082}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server.library-management.svc.cluster.local:8761/eureka/   # Eureka service in cluster
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+jwt:
+  secret: LibraryManagementSecretKey20241234567890
+  expiration: 86400000
+
+logging:
+  level:
+    com.library: DEBUG
+    org.springframework.cloud.config: INFO
+    org.springframework.security: INFO
+    root: INFO
