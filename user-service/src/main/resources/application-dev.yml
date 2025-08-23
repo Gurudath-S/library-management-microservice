@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: user-service
+  profiles:
+    active: dev
+  config:
+    import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://config-server.library-management.svc.cluster.local:8888}
