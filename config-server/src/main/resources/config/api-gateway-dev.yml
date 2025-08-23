@@ -26,8 +26,7 @@ spring:
               - PATCH
               - OPTIONS
             allowedHeaders: "*"
-            allowedOrigins: "*"
-            allowCredentials: true
+            allowCredentials: false
             maxAge: 3600
 
 logging:

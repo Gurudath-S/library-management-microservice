@@ -8,9 +8,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.http.HttpMethod;
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -18,28 +16,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-       http
-        .csrf().disable()
-        .authorizeExchange()
-            .pathMatchers(HttpMethod.OPTIONS).permitAll() // Allow OPTIONS requests
-            .pathMatchers("/actuator/**").permitAll() // Allow actuator endpoints
-            .pathMatchers("/actuator/health/**").permitAll() // Allow health endpoints
-            .anyExchange().authenticated()
-        .and()
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()));
-    return http.build();
+        return http
+            .csrf(csrf -> csrf.disable())
+            .authorizeExchange(exchanges -> exchanges
+                .anyExchange().permitAll() // Allow all requests to pass through to services
+            )
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Use allowedOriginPatterns instead of allowedOrigins when allowCredentials is true
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        
+        // Allow all origins without credentials to prevent CORS conflicts
+        configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(false); // This prevents the CORS conflict with wildcard origins
         configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

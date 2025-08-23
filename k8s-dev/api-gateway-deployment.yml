@@ -5,7 +5,7 @@ metadata:
   labels:
     app: api-gateway
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: microservice.azurecr.io/api-gateway:latest
+          image: microservice.azurecr.io/api-gateway:1.0.8
           ports:
             - containerPort: 8080
           env:
