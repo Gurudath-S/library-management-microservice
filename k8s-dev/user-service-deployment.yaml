@@ -33,7 +33,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8081  
+              port: 8081
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
@@ -42,6 +42,8 @@ spec:
               port: 8081
             initialDelaySeconds: 30
             periodSeconds: 30
+      imagePullSecrets:
+        - name: acr-auth
 ---
 apiVersion: v1
 kind: Service
