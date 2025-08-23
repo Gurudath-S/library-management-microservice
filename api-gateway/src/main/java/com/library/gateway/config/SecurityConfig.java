@@ -16,7 +16,9 @@ public class SecurityConfig {
        http
         .csrf().disable()
         .authorizeExchange()
-            .pathMatchers(HttpMethod.OPTIONS).permitAll() // <-- This line is important
+            .pathMatchers(HttpMethod.OPTIONS).permitAll() // Allow OPTIONS requests
+            .pathMatchers("/actuator/**").permitAll() // Allow actuator endpoints
+            .pathMatchers("/actuator/health/**").permitAll() // Allow health endpoints
             .anyExchange().authenticated()
         .and()
         .cors().and();

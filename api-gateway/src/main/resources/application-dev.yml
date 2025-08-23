@@ -5,15 +5,3 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-server.library-management.svc.cluster.local:8761/eureka/
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      enabled: true
-      show-details: always
-  security:
-    enabled: false
