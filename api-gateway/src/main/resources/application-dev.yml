@@ -1,22 +1,19 @@
 spring:
   config:
     import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://config-server:8888}
-  cloud:
-    gateway:
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
-            maxAge: 3600
 eureka:
   client:
     service-url:
       defaultZone: http://eureka-server.library-management.svc.cluster.local:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+  security:
+    enabled: false
