@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-server
+  labels:
+    app: config-server
+  namespace: library-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-server
+  template:
+    metadata:
+      labels:
+        app: config-server
+    spec:
+      containers:
+        - name: config-server
+          image: microservice.azurecr.io/spring-config:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8888
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: native,dev
+            - name: SERVER_PORT
+              value: "8888"
+      imagePullSecrets:
+        - name: acr-secret   # if your ACR requires secret pull
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-server
+  namespace: library-management
+spec:
+  selector:
+    app: config-server
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: 8888
+  type: NodePort

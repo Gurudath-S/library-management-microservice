@@ -1,0 +1,48 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+
+eureka:
+  instance:
+    prefer-ip-address: false   # Use DNS instead of pod IP
+    hostname: eureka-server.library-management.svc.cluster.local
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://eureka-server.library-management.svc.cluster.local:8761/eureka/
+    initial-instance-info-replication-interval-seconds: 5
+    registry-fetch-interval-seconds: 5
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
+    renewal-percent-threshold: 0.85
+    max-threads-for-status-replication: 1
+    max-threads-for-peer-replication: 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.netflix.eureka: WARN
+    com.netflix.discovery: WARN
+    com.netflix: WARN
+    org.springframework.cloud: DEBUG
+    root: INFO
+
+metrics:
+  export:
+    prometheus:
+      enabled: false
