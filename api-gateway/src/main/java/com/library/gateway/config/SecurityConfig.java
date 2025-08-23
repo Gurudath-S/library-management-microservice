@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -12,11 +13,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http
-            .csrf(csrf -> csrf.disable())
-            .authorizeExchange(exchanges -> exchanges
-                .anyExchange().permitAll()
-            )
-            .build();
+       http
+        .csrf().disable()
+        .authorizeExchange()
+            .pathMatchers(HttpMethod.OPTIONS).permitAll() // <-- This line is important
+            .anyExchange().authenticated()
+        .and()
+        .cors().and();
+    return http.build();
     }
 }
